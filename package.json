@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "noflo": "0.4.x",
-    "request": "~2.34.0"
-    "util": "~0.10.3"
+    "request": "~2.34.0",
+    "util": "~0.10.3",
     "lodash": "~2.4.1"
   },
   "devDependencies": {
@@ -24,9 +24,9 @@
     "coffee-script": "1.4.x"
   },
   "noflo": {
-		"icon": "cloud",
+    "icon": "cloud",
     "components": {
-			"GetConditions": "./components/GetConditions.coffee",
+    "GetConditions": "./components/GetConditions.coffee",
 		}
   },
   "scripts": {
