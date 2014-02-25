@@ -36,7 +36,7 @@ class GetConditions extends noflo.AsyncComponent
       @timestamp = data
 
     @inPorts.options.on 'data', (data) =>
-      @options = if (typeof data is "string") JSON.parse(data) else data
+      @options = if (typeof data is "string") then JSON.parse(data) else data
 
     super()
     
