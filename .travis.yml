@@ -6,3 +6,4 @@ script: npm test
 
 notifications:
     irc: "irc.freenode.org#fbp"
+    
