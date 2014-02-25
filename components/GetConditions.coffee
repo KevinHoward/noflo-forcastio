@@ -14,11 +14,11 @@ class GetConditions extends noflo.AsyncComponent
     @url = "https://api.forecast.io/forecast/"
 
     @inPorts =
-      apikey: new noflo.Port 
-      latitude: new noflo.Port 
-      longitude: new noflo.Port 
+      apikey: new noflo.Port
+      latitude: new noflo.Port
+      longitude: new noflo.Port
       timestamp: new noflo.Port
-      options: new noflo.Port 
+      options: new noflo.Port
 
     @outPorts =
       out: new noflo.Port
@@ -64,20 +64,13 @@ class GetConditions extends noflo.AsyncComponent
     
     url = url + "," + @timestamp if @timestamp
     
-    query = _.reduce(options, (result, val, key) ->
-        return result + "&" + key + "=" + val  if result
-        result + "?" + key + "=" + val
-      , "")
-      
-    url += query
-      
     # Request conditions from Forecast.IO
     request.get
         uri: url
+        qs: @options
         timeout: requestTimeout
       , (err, res, data) ->
           return callback err if err
-        else
           try
             # Return the number of daily calls made
             @outPorts.calls.send res.headers["X-Forecast-API-Calls"]
