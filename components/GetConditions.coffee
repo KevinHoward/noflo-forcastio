@@ -11,8 +11,6 @@ class GetConditions extends noflo.AsyncComponent
     @options = null
     @timestamp = null
 
-    @url = "https://api.forecast.io/forecast/"
-
     @inPorts =
       apikey: new noflo.Port
       latitude: new noflo.Port
@@ -38,49 +36,45 @@ class GetConditions extends noflo.AsyncComponent
       @timestamp = data
 
     @inPorts.options.on 'data', (data) =>
-      @options = data
+      @options = if (typeof data is "string") JSON.parse(data) else data
 
     super()
     
-  checkRequired: (data, callback) ->
+  doAsync: (data, callback) ->
+    # Validate required inputs
     unless @apikey
       return callback new Error "Missing Forecast.IO APIKey"
+
     unless @latitude
       return callback new Error "Missing Latitude"
+
     unless @longitude
       return callback new Error "Missing Longitude"
-    do callback
 
-  doAsync: (data, callback) ->
-    # Validate inputs
-    @checkRequired data, (err) =>
-      return callback err if err
-      
-    # Set timeout
-    requestTimeout = @options.timeout or 2500
-      
     # Declare URL
-    url = @url + @options.APIKey + "/" + @latitude + "," + @longitude
+    url = "https://api.forecast.io/forecast/"
+    url += @apikey + "/" + @latitude + "," + @longitude
     
-    url = url + "," + @timestamp if @timestamp
+    # Append Timestamp if provided
+    url += "," + @timestamp if @timestamp
     
     # Request conditions from Forecast.IO
     request.get
-        uri: url
-        qs: @options
-        timeout: requestTimeout
+      uri: url
+      qs: @options
+      timeout: @options.timeout ? 2500
       , (err, res, data) ->
-          return callback err if err
-          try
-            # Return the number of daily calls made
-            @outPorts.calls.send res.headers["X-Forecast-API-Calls"]
-            @outPorts.calls.disconnect()
-            
-            # Return the data from request
-            @outPorts.out.send data
-            @outPorts.out.disconnect()
-            callback()
-          catch e
-            return callback e
+        return callback err if err
+        try
+          # Return the number of daily calls made
+          @outPorts.calls.send res.headers["X-Forecast-API-Calls"]
+          @outPorts.calls.disconnect()
+
+          # Return the data from request
+          @outPorts.out.send data
+          @outPorts.out.disconnect()
+          callback()
+        catch e
+          return callback e
       
 exports.getComponent = -> new GetConditions
