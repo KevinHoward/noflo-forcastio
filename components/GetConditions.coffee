@@ -6,37 +6,24 @@ _ = require("lodash")
 class GetConditions extends noflo.AsyncComponent
   constructor: ->
     @apikey = null
-    @latitude = null
-    @longitude = null
-    @options = null
-    @timestamp = null
+    @ins = null
 
     @inPorts =
+      in: new noflo.Port
       apikey: new noflo.Port
-      latitude: new noflo.Port
-      longitude: new noflo.Port
-      timestamp: new noflo.Port
-      options: new noflo.Port
 
     @outPorts =
       out: new noflo.Port
       calls: new noflo.Port
       error: new noflo.Port
+  
+    @inPorts.in.on 'data', (data) =>
+      @ins = if (typeof data is "string")
+      then JSON.parse(data)
+      else data
 
     @inPorts.apikey.on 'data', (data) =>
       @apikey = data
-   
-    @inPorts.latitude.on 'data', (data) =>
-      @latitude = data
-      
-    @inPorts.longitude.on 'data', (data) =>
-      @longitude = data
-
-    @inPorts.timestamp.on 'data', (data) =>
-      @timestamp = data
-
-    @inPorts.options.on 'data', (data) =>
-      @options = if (typeof data is "string") then JSON.parse(data) else data
 
     super()
     
@@ -44,35 +31,45 @@ class GetConditions extends noflo.AsyncComponent
     # Validate required inputs
     unless @apikey
       return callback new Error "Missing Forecast.IO APIKey"
-
-    unless @latitude
+    
+    unless @ins.latitude
       return callback new Error "Missing Latitude"
 
-    unless @longitude
+    unless @ins.longitude
       return callback new Error "Missing Longitude"
+
+    # Set the request timeout and remove it from the options
+    if @ins.timeout
+      timeout = @ins.timeout
+      delete ins["timeout"]
+    else
+      timeout = 2500
 
     # Declare URL
     url = "https://api.forecast.io/forecast/"
-    url += @apikey + "/" + @latitude + "," + @longitude
+    url += @apikey + "/" + @ins.latitude + "," + @ins.longitude
     
     # Append Timestamp if provided
-    url += "," + @timestamp if @timestamp
+    url += "," + @ins.timestamp if @ins.timestamp
     
     # Request conditions from Forecast.IO
     request.get
       uri: url
-      qs: @options
-      timeout: @options.timeout ? 2500
-      , (err, res, data) ->
+      qs: @ins.options
+      timeout: timeout
+      , (err, response, data) ->
         return callback err if err
         try
           # Return the number of daily calls made
-          @outPorts.calls.send res.headers["X-Forecast-API-Calls"]
-          @outPorts.calls.disconnect()
+          @outPorts.calls.send response.headers["X-Forecast-API-Calls"]
 
           # Return the data from request
           @outPorts.out.send data
+
+          # Close out ports
+          @outPorts.calls.disconnect()
           @outPorts.out.disconnect()
+          
           callback()
         catch e
           return callback e
