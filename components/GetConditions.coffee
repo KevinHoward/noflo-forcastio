@@ -1,7 +1,5 @@
 noflo = require 'noflo'
-request = require("request")
-util = require("util")
-_ = require("lodash")
+request = require 'request'
 
 class GetConditions extends noflo.AsyncComponent
   constructor: ->
@@ -18,7 +16,7 @@ class GetConditions extends noflo.AsyncComponent
       error: new noflo.Port
   
     @inPorts.in.on 'data', (data) =>
-      @ins = if (typeof data is "string")
+      @ins = if (typeof data is 'string')
       then JSON.parse(data)
       else data
 
@@ -38,35 +36,40 @@ class GetConditions extends noflo.AsyncComponent
     unless @ins.longitude
       return callback new Error "Missing Longitude"
 
-    # Set the request timeout and remove it from the options
-    if @ins.timeout
-      timeout = @ins.timeout
-      delete ins["timeout"]
-    else
-      timeout = 2500
-
-    # Declare URL
+    # Declare Forecast.IO web service URL
     url = "https://api.forecast.io/forecast/"
     url += @apikey + "/" + @ins.latitude + "," + @ins.longitude
-    
-    # Append Timestamp if provided
-    url += "," + @ins.timestamp if @ins.timestamp
+    delete @ins['latitude']
+    delete @ins['longitudeitude']
+
+
+    # Append Timestamp to url if present
+    if @ins.timestamp
+      url += "," + @ins.timestamp
+      delete @ins['timestamp']
+
+    # Set the request timeout
+    if @ins.timeout
+      timeout = @ins.timeout
+      delete @ins['timeout']
+    else
+      timeout = 2500
     
     # Request conditions from Forecast.IO
     request.get
       uri: url
-      qs: @ins.options
+      qs: @ins
       timeout: timeout
       , (err, response, data) ->
         return callback err if err
         try
           # Return the number of daily calls made
-          @outPorts.calls.send response.headers["X-Forecast-API-Calls"]
+          @outPorts.calls.send response.headers['X-Forecast-API-Calls']
 
           # Return the data from request
           @outPorts.out.send data
 
-          # Close out ports
+          # Close out-ports
           @outPorts.calls.disconnect()
           @outPorts.out.disconnect()
           
