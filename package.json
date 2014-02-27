@@ -10,7 +10,7 @@
     }
   ],
   "engines": {
-    "node": ">=0.6.0"
+    "node": ">=0.8.*"
   },
   "dependencies": {
     "noflo": "0.4.x",
@@ -21,7 +21,7 @@
   "devDependencies": {
     "nodeunit": ">=0.6.0",
     "coffeelint": "*",
-    "coffee-script": "1.4.x"
+    "coffee-script": "1.7.x"
   },
   "noflo": {
     "icon": "cloud",
