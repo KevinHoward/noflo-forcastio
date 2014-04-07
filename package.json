@@ -1,8 +1,14 @@
 {
   "name": "noflo-forecastio",
   "description": "Forecast.IO component for the NoFlo flow-based programming environment",
-  "author": "Kevin Howard <kevin@h0ward.net>",
-  "version": "0.0.1",
+  "keywords": ["noflo","forecast","weather"],
+  "author": [
+    {
+      "name": "Kevin Howard",
+      "email": "kevin@h0ward.net"
+    }
+  ],
+  "version": "0.0.2",
   "licenses": [
     {
       "type": "MIT",
@@ -10,7 +16,7 @@
     }
   ],
   "engines": {
-    "node": ">=0.8.*"
+    "node": ">=0.6.0"
   },
   "dependencies": {
     "noflo": "0.5.x",
@@ -21,7 +27,7 @@
   "devDependencies": {
     "nodeunit": ">=0.6.0",
     "coffeelint": "*",
-    "coffee-script": "1.7.x"
+    "coffee-script": "1.4.x"
   },
   "noflo": {
     "icon": "cloud",
