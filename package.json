@@ -20,14 +20,14 @@
   },
   "dependencies": {
     "noflo": "0.5.x",
-    "request": "~2.34.0",
+    "request": "2.45.0",
     "util": "~0.10.3",
     "lodash": "~2.4.1"
   },
   "devDependencies": {
     "nodeunit": ">=0.6.0",
     "coffeelint": "*",
-    "coffee-script": "1.4.x"
+    "coffee-script": ">=1.4.x"
   },
   "noflo": {
     "icon": "cloud",
